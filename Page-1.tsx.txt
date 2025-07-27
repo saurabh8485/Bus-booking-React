@@ -1,0 +1,1254 @@
+// The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
+
+import React, { useState } from 'react';
+import { 
+  Button, 
+  Input, 
+  DatePicker, 
+  Select, 
+  Card, 
+  Row, 
+  Col, 
+  Slider, 
+  Checkbox, 
+  Rate, 
+  Form, 
+  Radio, 
+  Modal,
+  Badge,
+  Divider,
+  Avatar,
+  Tabs,
+  Space,
+  Tag
+} from 'antd';
+import {
+  SearchOutlined,
+  SwapOutlined,
+  CalendarOutlined,
+  UserOutlined,
+  MenuOutlined,
+  StarFilled,
+  ClockCircleOutlined,
+  CarOutlined,
+  WifiOutlined,
+  SafetyCertificateOutlined,
+  DownloadOutlined,
+  ShareAltOutlined,
+  QrcodeOutlined
+} from '@ant-design/icons';
+import dayjs from 'dayjs';
+
+const { Option } = Select;
+const { TabPane } = Tabs;
+
+const App: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [searchData, setSearchData] = useState({
+    from: '',
+    to: '',
+    date: null,
+    returnDate: null
+  });
+  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const cities = [
+    'New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix',
+    'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'
+  ];
+
+  const busData = [
+    {
+      id: 1,
+      operator: 'Greyhound Express',
+      type: 'AC Sleeper',
+      departure: '06:00',
+      arrival: '14:30',
+      duration: '8h 30m',
+      fare: 45,
+      seats: 28,
+      rating: 4.2,
+      amenities: ['WiFi', 'AC', 'Charging Point', 'Water Bottle']
+    },
+    {
+      id: 2,
+      operator: 'MegaBus Premium',
+      type: 'AC Semi Sleeper',
+      departure: '08:15',
+      arrival: '16:45',
+      duration: '8h 30m',
+      fare: 38,
+      seats: 15,
+      rating: 4.0,
+      amenities: ['WiFi', 'AC', 'Snacks']
+    },
+    {
+      id: 3,
+      operator: 'FlixBus Comfort',
+      type: 'AC Seater',
+      departure: '10:30',
+      arrival: '19:00',
+      duration: '8h 30m',
+      fare: 32,
+      seats: 22,
+      rating: 3.8,
+      amenities: ['AC', 'Charging Point']
+    }
+  ];
+
+  const renderHeader = () => (
+    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <div className="text-2xl font-bold text-red-600 cursor-pointer" onClick={() => setCurrentPage('home')}>
+              <i className="fas fa-bus mr-2"></i>
+              RedBus
+            </div>
+          </div>
+          
+          <nav className="hidden md:flex space-x-8">
+            <button 
+              className={`text-gray-700 hover:text-red-600 font-medium cursor-pointer !rounded-button whitespace-nowrap ${currentPage === 'home' ? 'text-red-600' : ''}`}
+              onClick={() => setCurrentPage('home')}
+            >
+              Home
+            </button>
+            <button 
+              className={`text-gray-700 hover:text-red-600 font-medium cursor-pointer !rounded-button whitespace-nowrap ${currentPage === 'search' ? 'text-red-600' : ''}`}
+              onClick={() => setCurrentPage('search')}
+            >
+              Bus Tickets
+            </button>
+            <button 
+              className="text-gray-700 hover:text-red-600 font-medium cursor-pointer !rounded-button whitespace-nowrap"
+              onClick={() => setCurrentPage('offers')}
+            >
+              Offers
+            </button>
+            <button 
+              className={`text-gray-700 hover:text-red-600 font-medium cursor-pointer !rounded-button whitespace-nowrap ${currentPage === 'bookings' ? 'text-red-600' : ''}`}
+              onClick={() => setCurrentPage('bookings')}
+            >
+              My Bookings
+            </button>
+            <button className="text-gray-700 hover:text-red-600 font-medium cursor-pointer !rounded-button whitespace-nowrap">
+              Help
+            </button>
+          </nav>
+
+          <div className="flex items-center space-x-4">
+            {isLoggedIn ? (
+              <div className="flex items-center space-x-2">
+                <Avatar size="small" icon={<UserOutlined />} className="cursor-pointer" />
+                <span className="text-sm text-gray-700">John Doe</span>
+              </div>
+            ) : (
+              <Button 
+                type="primary" 
+                className="bg-red-600 border-red-600 hover:bg-red-700 !rounded-button whitespace-nowrap cursor-pointer"
+                onClick={() => setShowLoginModal(true)}
+              >
+                Login / Signup
+              </Button>
+            )}
+            
+            <Button 
+              className="md:hidden !rounded-button cursor-pointer"
+              icon={<MenuOutlined />}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            />
+          </div>
+        </div>
+        
+        {mobileMenuOpen && (
+          <div className="md:hidden py-4 border-t border-gray-200">
+            <div className="flex flex-col space-y-2">
+              <button className="text-left py-2 text-gray-700 hover:text-red-600 cursor-pointer !rounded-button whitespace-nowrap" onClick={() => setCurrentPage('home')}>Home</button>
+              <button className="text-left py-2 text-gray-700 hover:text-red-600 cursor-pointer !rounded-button whitespace-nowrap" onClick={() => setCurrentPage('search')}>Bus Tickets</button>
+              <button className="text-left py-2 text-gray-700 hover:text-red-600 cursor-pointer !rounded-button whitespace-nowrap">Offers</button>
+              <button className="text-left py-2 text-gray-700 hover:text-red-600 cursor-pointer !rounded-button whitespace-nowrap" onClick={() => setCurrentPage('bookings')}>My Bookings</button>
+              <button className="text-left py-2 text-gray-700 hover:text-red-600 cursor-pointer !rounded-button whitespace-nowrap">Help</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+
+  const renderHomePage = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div 
+        className="relative bg-cover bg-center h-96 flex items-center justify-center"
+        style={{
+          backgroundImage: `url('https://readdy.ai/api/search-image?query=modern%20luxury%20bus%20traveling%20on%20scenic%20highway%20with%20mountains%20and%20blue%20sky%20background%2C%20professional%20travel%20photography%2C%20clean%20minimalist%20composition%20with%20warm%20lighting%20and%20vibrant%20colors&width=1440&height=400&seq=hero-bg-001&orientation=landscape')`
+        }}
+      >
+        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div className="relative z-10 text-center text-white max-w-4xl px-4">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">Book Your Bus Journey</h1>
+          <p className="text-xl md:text-2xl mb-8">Travel safely and comfortably with trusted operators</p>
+          
+          <Card className="bg-white bg-opacity-95 p-6 rounded-lg shadow-lg">
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} sm={6}>
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">From</label>
+                  <Select
+                    placeholder="Select departure city"
+                    className="w-full"
+                    size="large"
+                    showSearch
+                    value={searchData.from}
+                    onChange={(value) => setSearchData({...searchData, from: value})}
+                  >
+                    {cities.map(city => (
+                      <Option key={city} value={city}>{city}</Option>
+                    ))}
+                  </Select>
+                </div>
+              </Col>
+              
+              <Col xs={24} sm={1} className="text-center">
+                <SwapOutlined className="text-2xl text-red-600 cursor-pointer hover:text-red-700" />
+              </Col>
+              
+              <Col xs={24} sm={6}>
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">To</label>
+                  <Select
+                    placeholder="Select destination city"
+                    className="w-full"
+                    size="large"
+                    showSearch
+                    value={searchData.to}
+                    onChange={(value) => setSearchData({...searchData, to: value})}
+                  >
+                    {cities.map(city => (
+                      <Option key={city} value={city}>{city}</Option>
+                    ))}
+                  </Select>
+                </div>
+              </Col>
+              
+              <Col xs={24} sm={5}>
+                <div className="relative">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Departure Date</label>
+                  <DatePicker
+                    className="w-full"
+                    size="large"
+                    placeholder="Select date"
+                    value={searchData.date}
+                    onChange={(date) => setSearchData({...searchData, date})}
+                    disabledDate={(current) => current && current < dayjs().startOf('day')}
+                  />
+                </div>
+              </Col>
+              
+              <Col xs={24} sm={6}>
+                <Button 
+                  type="primary" 
+                  size="large" 
+                  className="w-full bg-red-600 border-red-600 hover:bg-red-700 h-12 text-lg font-semibold !rounded-button whitespace-nowrap cursor-pointer"
+                  icon={<SearchOutlined />}
+                  onClick={() => setCurrentPage('search')}
+                >
+                  Search Buses
+                </Button>
+              </Col>
+            </Row>
+          </Card>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose RedBus?</h2>
+          <p className="text-lg text-gray-600">Experience the best in bus travel with our premium services</p>
+        </div>
+        
+        <Row gutter={[32, 32]}>
+          <Col xs={24} md={8}>
+            <Card className="text-center h-full border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <div className="mb-4">
+                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+                  <SafetyCertificateOutlined className="text-2xl text-red-600" />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Safe & Secure</h3>
+              <p className="text-gray-600">Travel with confidence knowing your safety is our top priority with verified operators and secure payments.</p>
+            </Card>
+          </Col>
+          
+          <Col xs={24} md={8}>
+            <Card className="text-center h-full border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <div className="mb-4">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                  <ClockCircleOutlined className="text-2xl text-blue-600" />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">On-Time Guarantee</h3>
+              <p className="text-gray-600">Punctual departures and arrivals with real-time tracking to keep you informed throughout your journey.</p>
+            </Card>
+          </Col>
+          
+          <Col xs={24} md={8}>
+            <Card className="text-center h-full border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <div className="mb-4">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                  <CarOutlined className="text-2xl text-green-600" />
+                </div>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Comfort First</h3>
+              <p className="text-gray-600">Enjoy premium amenities including AC, WiFi, charging points, and comfortable seating for a pleasant journey.</p>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+    </div>
+  );
+
+  const renderSearchResults = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-6">
+          <Card className="p-4">
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} sm={5}>
+                <Select
+                  placeholder="From"
+                  className="w-full"
+                  value={searchData.from || 'New York'}
+                  onChange={(value) => setSearchData({...searchData, from: value})}
+                >
+                  {cities.map(city => (
+                    <Option key={city} value={city}>{city}</Option>
+                  ))}
+                </Select>
+              </Col>
+              <Col xs={24} sm={5}>
+                <Select
+                  placeholder="To"
+                  className="w-full"
+                  value={searchData.to || 'Los Angeles'}
+                  onChange={(value) => setSearchData({...searchData, to: value})}
+                >
+                  {cities.map(city => (
+                    <Option key={city} value={city}>{city}</Option>
+                  ))}
+                </Select>
+              </Col>
+              <Col xs={24} sm={4}>
+                <DatePicker
+                  className="w-full"
+                  value={searchData.date || dayjs()}
+                  onChange={(date) => setSearchData({...searchData, date})}
+                />
+              </Col>
+              <Col xs={24} sm={4}>
+                <Button 
+                  type="primary" 
+                  className="w-full bg-red-600 border-red-600 hover:bg-red-700 !rounded-button whitespace-nowrap cursor-pointer"
+                  icon={<SearchOutlined />}
+                >
+                  Modify Search
+                </Button>
+              </Col>
+            </Row>
+          </Card>
+        </div>
+
+        <Row gutter={[24, 24]}>
+          <Col xs={24} lg={6}>
+            <Card title="Filters" className="sticky top-24">
+              <div className="space-y-6">
+                <div>
+                  <h4 className="font-semibold mb-3">Bus Type</h4>
+                  <Checkbox.Group className="flex flex-col space-y-2">
+                    <Checkbox value="ac">AC</Checkbox>
+                    <Checkbox value="non-ac">Non-AC</Checkbox>
+                    <Checkbox value="sleeper">Sleeper</Checkbox>
+                    <Checkbox value="semi-sleeper">Semi Sleeper</Checkbox>
+                  </Checkbox.Group>
+                </div>
+                
+                <Divider />
+                
+                <div>
+                  <h4 className="font-semibold mb-3">Departure Time</h4>
+                  <Checkbox.Group className="flex flex-col space-y-2">
+                    <Checkbox value="early">Early Morning (6AM - 10AM)</Checkbox>
+                    <Checkbox value="morning">Morning (10AM - 2PM)</Checkbox>
+                    <Checkbox value="afternoon">Afternoon (2PM - 6PM)</Checkbox>
+                    <Checkbox value="evening">Evening (6PM - 10PM)</Checkbox>
+                    <Checkbox value="night">Night (10PM - 6AM)</Checkbox>
+                  </Checkbox.Group>
+                </div>
+                
+                <Divider />
+                
+                <div>
+                  <h4 className="font-semibold mb-3">Price Range</h4>
+                  <Slider range defaultValue={[20, 80]} max={100} />
+                  <div className="flex justify-between text-sm text-gray-600 mt-2">
+                    <span>$20</span>
+                    <span>$80</span>
+                  </div>
+                </div>
+                
+                <Divider />
+                
+                <div>
+                  <h4 className="font-semibold mb-3">Amenities</h4>
+                  <Checkbox.Group className="flex flex-col space-y-2">
+                    <Checkbox value="wifi">WiFi</Checkbox>
+                    <Checkbox value="charging">Charging Point</Checkbox>
+                    <Checkbox value="water">Water Bottle</Checkbox>
+                    <Checkbox value="snacks">Snacks</Checkbox>
+                  </Checkbox.Group>
+                </div>
+              </div>
+            </Card>
+          </Col>
+          
+          <Col xs={24} lg={18}>
+            <div className="mb-4 flex justify-between items-center">
+              <h3 className="text-lg font-semibold">{busData.length} buses found</h3>
+              <Select defaultValue="price" className="w-48">
+                <Option value="price">Sort by Price</Option>
+                <Option value="time">Sort by Departure Time</Option>
+                <Option value="rating">Sort by Rating</Option>
+                <Option value="duration">Sort by Duration</Option>
+              </Select>
+            </div>
+            
+            <div className="space-y-4">
+              {busData.map((bus) => (
+                <Card key={bus.id} className="hover:shadow-lg transition-shadow">
+                  <Row gutter={[16, 16]} align="middle">
+                    <Col xs={24} sm={8}>
+                      <div>
+                        <h4 className="text-lg font-semibold text-gray-900">{bus.operator}</h4>
+                        <p className="text-sm text-gray-600">{bus.type}</p>
+                        <div className="flex items-center mt-1">
+                          <Rate disabled defaultValue={Math.floor(bus.rating)} className="text-xs" />
+                          <span className="ml-2 text-sm text-gray-600">{bus.rating}</span>
+                        </div>
+                      </div>
+                    </Col>
+                    
+                    <Col xs={24} sm={6}>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-gray-900">{bus.departure}</div>
+                        <div className="text-sm text-gray-600">Departure</div>
+                      </div>
+                    </Col>
+                    
+                    <Col xs={24} sm={4}>
+                      <div className="text-center">
+                        <div className="text-sm text-gray-600">{bus.duration}</div>
+                        <div className="w-full h-px bg-gray-300 my-2"></div>
+                        <div className="text-xl font-bold text-gray-900">{bus.arrival}</div>
+                        <div className="text-sm text-gray-600">Arrival</div>
+                      </div>
+                    </Col>
+                    
+                    <Col xs={24} sm={6}>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-green-600">${bus.fare}</div>
+                        <div className="text-sm text-gray-600">{bus.seats} seats available</div>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {bus.amenities.slice(0, 3).map((amenity, index) => (
+                            <Tag key={index} size="small" color="blue">{amenity}</Tag>
+                          ))}
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                  
+                  <Divider className="my-4" />
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="flex space-x-4">
+                      <span className="text-sm text-gray-600">
+                        <i className="fas fa-map-marker-alt mr-1"></i>
+                        Boarding Points: 5
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        <i className="fas fa-map-marker-alt mr-1"></i>
+                        Dropping Points: 8
+                      </span>
+                    </div>
+                    <Button 
+                      type="primary" 
+                      className="bg-red-600 border-red-600 hover:bg-red-700 !rounded-button whitespace-nowrap cursor-pointer"
+                      onClick={() => setCurrentPage('seats')}
+                    >
+                      View Seats
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </Col>
+        </Row>
+      </div>
+    </div>
+  );
+
+  const renderSeatSelection = () => {
+    const seatLayout = [
+      ['1A', '1B', '', '1C', '1D'],
+      ['2A', '2B', '', '2C', '2D'],
+      ['3A', '3B', '', '3C', '3D'],
+      ['4A', '4B', '', '4C', '4D'],
+      ['5A', '5B', '', '5C', '5D'],
+      ['6A', '6B', '', '6C', '6D'],
+      ['7A', '7B', '', '7C', '7D'],
+      ['8A', '8B', '', '8C', '8D'],
+      ['9A', '9B', '', '9C', '9D'],
+      ['10A', '10B', '', '10C', '10D']
+    ];
+    
+    const bookedSeats = ['1A', '2C', '3B', '5D', '7A', '8C'];
+    
+    const getSeatStatus = (seat: string) => {
+      if (!seat) return 'empty';
+      if (bookedSeats.includes(seat)) return 'booked';
+      if (selectedSeats.includes(seat)) return 'selected';
+      return 'available';
+    };
+    
+    const getSeatClass = (status: string) => {
+      switch (status) {
+        case 'available': return 'bg-white border-2 border-gray-300 hover:border-blue-400 cursor-pointer';
+        case 'selected': return 'bg-red-600 border-2 border-red-600 text-white cursor-pointer';
+        case 'booked': return 'bg-gray-400 border-2 border-gray-400 text-white cursor-not-allowed';
+        default: return '';
+      }
+    };
+    
+    const handleSeatClick = (seat: string) => {
+      if (bookedSeats.includes(seat)) return;
+      
+      if (selectedSeats.includes(seat)) {
+        setSelectedSeats(selectedSeats.filter(s => s !== seat));
+      } else {
+        if (selectedSeats.length < 6) {
+          setSelectedSeats([...selectedSeats, seat]);
+        }
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <Card className="mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold">Greyhound Express</h2>
+                <p className="text-gray-600">New York → Los Angeles • Today, 06:00 AM</p>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-green-600">$45</div>
+                <div className="text-sm text-gray-600">per seat</div>
+              </div>
+            </div>
+          </Card>
+
+          <Row gutter={[24, 24]}>
+            <Col xs={24} lg={16}>
+              <Card title="Select Your Seats" className="h-fit">
+                <div className="mb-6 flex items-center space-x-6">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 bg-white border-2 border-gray-300 rounded"></div>
+                    <span className="text-sm">Available</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 bg-red-600 rounded"></div>
+                    <span className="text-sm">Selected</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-4 h-4 bg-gray-400 rounded"></div>
+                    <span className="text-sm">Booked</span>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-100 p-6 rounded-lg">
+                  <div className="text-center mb-4">
+                    <div className="inline-block bg-gray-800 text-white px-4 py-2 rounded-lg">
+                      <i className="fas fa-steering-wheel mr-2"></i>
+                      Driver
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    {seatLayout.map((row, rowIndex) => (
+                      <div key={rowIndex} className="flex justify-center space-x-2">
+                        {row.map((seat, seatIndex) => (
+                          <div key={seatIndex} className="w-10 h-10 flex items-center justify-center">
+                            {seat ? (
+                              <button
+                                className={`w-8 h-8 rounded text-xs font-medium transition-all ${getSeatClass(getSeatStatus(seat))}`}
+                                onClick={() => handleSeatClick(seat)}
+                                disabled={getSeatStatus(seat) === 'booked'}
+                              >
+                                {seat}
+                              </button>
+                            ) : (
+                              <div className="w-8 h-8"></div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <h4 className="font-semibold mb-3">Boarding & Dropping Points</h4>
+                  <Row gutter={[16, 16]}>
+                    <Col xs={24} sm={12}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Boarding Point</label>
+                      <Select className="w-full" placeholder="Select boarding point">
+                        <Option value="point1">Times Square - 06:00 AM</Option>
+                        <Option value="point2">Penn Station - 06:15 AM</Option>
+                        <Option value="point3">Port Authority - 06:30 AM</Option>
+                      </Select>
+                    </Col>
+                    <Col xs={24} sm={12}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Dropping Point</label>
+                      <Select className="w-full" placeholder="Select dropping point">
+                        <Option value="drop1">Hollywood Blvd - 02:30 PM</Option>
+                        <Option value="drop2">Downtown LA - 02:45 PM</Option>
+                        <Option value="drop3">LAX Airport - 03:00 PM</Option>
+                      </Select>
+                    </Col>
+                  </Row>
+                </div>
+              </Card>
+            </Col>
+            
+            <Col xs={24} lg={8}>
+              <Card title="Booking Summary" className="sticky top-24">
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold">Selected Seats</h4>
+                    {selectedSeats.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {selectedSeats.map(seat => (
+                          <Badge key={seat} count={seat} style={{ backgroundColor: '#dc2626' }} />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm mt-2">No seats selected</p>
+                    )}
+                  </div>
+                  
+                  <Divider />
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span>Base Fare ({selectedSeats.length} seats)</span>
+                      <span>${selectedSeats.length * 45}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Service Tax</span>
+                      <span>${Math.round(selectedSeats.length * 45 * 0.1)}</span>
+                    </div>
+                    <Divider />
+                    <div className="flex justify-between font-bold text-lg">
+                      <span>Total Amount</span>
+                      <span className="text-green-600">${Math.round(selectedSeats.length * 45 * 1.1)}</span>
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    type="primary" 
+                    size="large" 
+                    className="w-full bg-red-600 border-red-600 hover:bg-red-700 !rounded-button whitespace-nowrap cursor-pointer"
+                    disabled={selectedSeats.length === 0}
+                    onClick={() => setCurrentPage('passenger')}
+                  >
+                    Proceed to Book
+                  </Button>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+      </div>
+    );
+  };
+
+  const renderPassengerDetails = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <Card title="Passenger Details" className="mb-6">
+          <Form layout="vertical">
+            {selectedSeats.map((seat, index) => (
+              <div key={seat} className="mb-8 p-4 border border-gray-200 rounded-lg">
+                <h4 className="font-semibold mb-4">Passenger {index + 1} - Seat {seat}</h4>
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} sm={8}>
+                    <Form.Item label="Full Name" required>
+                      <Input placeholder="Enter full name" />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <Form.Item label="Age" required>
+                      <Input type="number" placeholder="Enter age" />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <Form.Item label="Gender" required>
+                      <Select placeholder="Select gender">
+                        <Option value="male">Male</Option>
+                        <Option value="female">Female</Option>
+                        <Option value="other">Other</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </div>
+            ))}
+            
+            <Card title="Contact Information" className="mb-6">
+              <Row gutter={[16, 16]}>
+                <Col xs={24} sm={12}>
+                  <Form.Item label="Email Address" required>
+                    <Input type="email" placeholder="Enter email address" />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <Form.Item label="Phone Number" required>
+                    <Input placeholder="Enter phone number" />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+            
+            <div className="flex justify-between">
+              <Button 
+                size="large" 
+                className="!rounded-button whitespace-nowrap cursor-pointer"
+                onClick={() => setCurrentPage('seats')}
+              >
+                Back to Seat Selection
+              </Button>
+              <Button 
+                type="primary" 
+                size="large" 
+                className="bg-red-600 border-red-600 hover:bg-red-700 !rounded-button whitespace-nowrap cursor-pointer"
+                onClick={() => setCurrentPage('payment')}
+              >
+                Continue to Payment
+              </Button>
+            </div>
+          </Form>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const renderPaymentPage = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <Row gutter={[24, 24]}>
+          <Col xs={24} lg={16}>
+            <Card title="Payment Options">
+              <Tabs defaultActiveKey="card">
+                <TabPane tab="Credit/Debit Card" key="card">
+                  <Form layout="vertical">
+                    <Row gutter={[16, 16]}>
+                      <Col xs={24}>
+                        <Form.Item label="Card Number" required>
+                          <Input placeholder="1234 5678 9012 3456" maxLength={19} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={12}>
+                        <Form.Item label="Expiry Date" required>
+                          <Input placeholder="MM/YY" maxLength={5} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={12}>
+                        <Form.Item label="CVV" required>
+                          <Input placeholder="123" maxLength={3} />
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24}>
+                        <Form.Item label="Cardholder Name" required>
+                          <Input placeholder="Enter cardholder name" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                  </Form>
+                </TabPane>
+                
+                <TabPane tab="UPI" key="upi">
+                  <Form layout="vertical">
+                    <Form.Item label="UPI ID" required>
+                      <Input placeholder="yourname@upi" />
+                    </Form.Item>
+                    <div className="text-center py-8">
+                      <QrcodeOutlined className="text-6xl text-gray-400 mb-4" />
+                      <p className="text-gray-600">Scan QR code with your UPI app</p>
+                    </div>
+                  </Form>
+                </TabPane>
+                
+                <TabPane tab="Net Banking" key="netbanking">
+                  <Form layout="vertical">
+                    <Form.Item label="Select Bank" required>
+                      <Select placeholder="Choose your bank">
+                        <Option value="sbi">State Bank of India</Option>
+                        <Option value="hdfc">HDFC Bank</Option>
+                        <Option value="icici">ICICI Bank</Option>
+                        <Option value="axis">Axis Bank</Option>
+                      </Select>
+                    </Form.Item>
+                  </Form>
+                </TabPane>
+                
+                <TabPane tab="Wallets" key="wallets">
+                  <div className="space-y-4">
+                    <Radio.Group className="w-full">
+                      <div className="space-y-3">
+                        <Radio value="paytm" className="w-full p-3 border rounded-lg">
+                          <div className="flex items-center">
+                            <i className="fab fa-paypal text-2xl mr-3"></i>
+                            <span>PayPal</span>
+                          </div>
+                        </Radio>
+                        <Radio value="googlepay" className="w-full p-3 border rounded-lg">
+                          <div className="flex items-center">
+                            <i className="fab fa-google-pay text-2xl mr-3"></i>
+                            <span>Google Pay</span>
+                          </div>
+                        </Radio>
+                        <Radio value="applepay" className="w-full p-3 border rounded-lg">
+                          <div className="flex items-center">
+                            <i className="fab fa-apple-pay text-2xl mr-3"></i>
+                            <span>Apple Pay</span>
+                          </div>
+                        </Radio>
+                      </div>
+                    </Radio.Group>
+                  </div>
+                </TabPane>
+              </Tabs>
+              
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center text-blue-700">
+                  <SafetyCertificateOutlined className="mr-2" />
+                  <span className="text-sm">Your payment information is secure and encrypted</span>
+                </div>
+              </div>
+            </Card>
+          </Col>
+          
+          <Col xs={24} lg={8}>
+            <Card title="Order Summary" className="sticky top-24">
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold">Journey Details</h4>
+                  <div className="text-sm text-gray-600 mt-2">
+                    <p>New York → Los Angeles</p>
+                    <p>Greyhound Express</p>
+                    <p>Today, 06:00 AM</p>
+                  </div>
+                </div>
+                
+                <Divider />
+                
+                <div>
+                  <h4 className="font-semibold">Passengers</h4>
+                  <div className="text-sm text-gray-600 mt-2">
+                    {selectedSeats.map((seat, index) => (
+                      <p key={seat}>Passenger {index + 1} - Seat {seat}</p>
+                    ))}
+                  </div>
+                </div>
+                
+                <Divider />
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Base Fare ({selectedSeats.length} seats)</span>
+                    <span>${selectedSeats.length * 45}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Service Tax</span>
+                    <span>${Math.round(selectedSeats.length * 45 * 0.1)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Convenience Fee</span>
+                    <span>$2</span>
+                  </div>
+                  <Divider />
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>Total Amount</span>
+                    <span className="text-green-600">${Math.round(selectedSeats.length * 45 * 1.1) + 2}</span>
+                  </div>
+                </div>
+                
+                <Button 
+                  type="primary" 
+                  size="large" 
+                  className="w-full bg-red-600 border-red-600 hover:bg-red-700 !rounded-button whitespace-nowrap cursor-pointer"
+                  onClick={() => setCurrentPage('confirmation')}
+                >
+                  Pay Now
+                </Button>
+                
+                <div className="flex items-center justify-center space-x-4 text-gray-400 text-2xl mt-4">
+                  <i className="fab fa-cc-visa"></i>
+                  <i className="fab fa-cc-mastercard"></i>
+                  <i className="fab fa-cc-amex"></i>
+                  <i className="fab fa-paypal"></i>
+                </div>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+    </div>
+  );
+
+  const renderConfirmation = () => (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="max-w-2xl mx-auto px-4">
+        <Card className="text-center">
+          <div className="mb-6">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i className="fas fa-check text-2xl text-green-600"></i>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
+            <p className="text-gray-600">Your bus ticket has been booked successfully</p>
+          </div>
+          
+          <div className="bg-gray-50 p-6 rounded-lg mb-6">
+            <div className="grid grid-cols-2 gap-4 text-left">
+              <div>
+                <h4 className="font-semibold text-gray-900">Booking ID</h4>
+                <p className="text-gray-600">RB123456789</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-900">Journey Date</h4>
+                <p className="text-gray-600">Today, 06:00 AM</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-900">Route</h4>
+                <p className="text-gray-600">New York → Los Angeles</p>
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-900">Seats</h4>
+                <p className="text-gray-600">{selectedSeats.join(', ')}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mb-6">
+            <div className="w-32 h-32 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <QrcodeOutlined className="text-4xl text-gray-600" />
+            </div>
+            <p className="text-sm text-gray-600">Show this QR code while boarding</p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button 
+              size="large" 
+              icon={<DownloadOutlined />}
+              className="flex-1 !rounded-button whitespace-nowrap cursor-pointer"
+            >
+              Download Ticket
+            </Button>
+            <Button 
+              size="large" 
+              icon={<ShareAltOutlined />}
+              className="flex-1 !rounded-button whitespace-nowrap cursor-pointer"
+            >
+              Share Trip Details
+            </Button>
+          </div>
+          
+          <div className="mt-6">
+            <Button 
+              type="primary" 
+              size="large" 
+              className="bg-red-600 border-red-600 hover:bg-red-700 !rounded-button whitespace-nowrap cursor-pointer"
+              onClick={() => setCurrentPage('home')}
+            >
+              Book Another Trip
+            </Button>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+
+  const renderBookings = () => (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold mb-6">My Bookings</h2>
+        
+        <Tabs defaultActiveKey="upcoming">
+          <TabPane tab="Upcoming Trips" key="upcoming">
+            <div className="space-y-4">
+              <Card>
+                <Row gutter={[16, 16]} align="middle">
+                  <Col xs={24} sm={16}>
+                    <div>
+                      <h4 className="text-lg font-semibold">New York → Los Angeles</h4>
+                      <p className="text-gray-600">Greyhound Express • AC Sleeper</p>
+                      <p className="text-sm text-gray-500">Booking ID: RB123456789</p>
+                      <div className="flex items-center mt-2">
+                        <CalendarOutlined className="mr-2 text-gray-400" />
+                        <span className="text-sm">Today, 06:00 AM</span>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold text-green-600">$45 × 2</div>
+                      <div className="text-sm text-gray-600">Seats: 1A, 1B</div>
+                      <div className="flex space-x-2 mt-3">
+                        <Button size="small" className="!rounded-button whitespace-nowrap cursor-pointer">Cancel</Button>
+                        <Button size="small" className="!rounded-button whitespace-nowrap cursor-pointer">Modify</Button>
+                        <Button size="small" type="primary" className="bg-red-600 border-red-600 !rounded-button whitespace-nowrap cursor-pointer">
+                          <DownloadOutlined />
+                        </Button>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </Card>
+              
+              <Card>
+                <Row gutter={[16, 16]} align="middle">
+                  <Col xs={24} sm={16}>
+                    <div>
+                      <h4 className="text-lg font-semibold">Chicago → Houston</h4>
+                      <p className="text-gray-600">MegaBus Premium • AC Semi Sleeper</p>
+                      <p className="text-sm text-gray-500">Booking ID: RB987654321</p>
+                      <div className="flex items-center mt-2">
+                        <CalendarOutlined className="mr-2 text-gray-400" />
+                        <span className="text-sm">Tomorrow, 08:15 AM</span>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold text-green-600">$38</div>
+                      <div className="text-sm text-gray-600">Seat: 3C</div>
+                      <div className="flex space-x-2 mt-3">
+                        <Button size="small" className="!rounded-button whitespace-nowrap cursor-pointer">Cancel</Button>
+                        <Button size="small" className="!rounded-button whitespace-nowrap cursor-pointer">Modify</Button>
+                        <Button size="small" type="primary" className="bg-red-600 border-red-600 !rounded-button whitespace-nowrap cursor-pointer">
+                          <DownloadOutlined />
+                        </Button>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </Card>
+            </div>
+          </TabPane>
+          
+          <TabPane tab="Past Trips" key="past">
+            <div className="space-y-4">
+              <Card>
+                <Row gutter={[16, 16]} align="middle">
+                  <Col xs={24} sm={16}>
+                    <div>
+                      <h4 className="text-lg font-semibold">Boston → New York</h4>
+                      <p className="text-gray-600">FlixBus Comfort • AC Seater</p>
+                      <p className="text-sm text-gray-500">Booking ID: RB456789123</p>
+                      <div className="flex items-center mt-2">
+                        <CalendarOutlined className="mr-2 text-gray-400" />
+                        <span className="text-sm">Last Week, 10:30 AM</span>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold text-gray-600">$32</div>
+                      <div className="text-sm text-gray-600">Seat: 5A</div>
+                      <Tag color="green" className="mt-2">Completed</Tag>
+                      <div className="mt-3">
+                        <Button size="small" type="primary" className="bg-red-600 border-red-600 !rounded-button whitespace-nowrap cursor-pointer">
+                          <DownloadOutlined />
+                        </Button>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </Card>
+            </div>
+          </TabPane>
+        </Tabs>
+      </div>
+    </div>
+  );
+
+  const renderLoginModal = () => (
+    <Modal
+      title="Login / Signup"
+      open={showLoginModal}
+      onCancel={() => setShowLoginModal(false)}
+      footer={null}
+      width={400}
+    >
+      <Tabs defaultActiveKey="login">
+        <TabPane tab="Login" key="login">
+          <Form layout="vertical">
+            <Form.Item label="Email or Phone" required>
+              <Input placeholder="Enter email or phone number" />
+            </Form.Item>
+            <Form.Item label="Password" required>
+              <Input.Password placeholder="Enter password" />
+            </Form.Item>
+            <Form.Item>
+              <Button 
+                type="primary" 
+                className="w-full bg-red-600 border-red-600 hover:bg-red-700 !rounded-button whitespace-nowrap cursor-pointer"
+                onClick={() => {
+                  setIsLoggedIn(true);
+                  setShowLoginModal(false);
+                }}
+              >
+                Login
+              </Button>
+            </Form.Item>
+            <div className="text-center">
+              <Button type="link" className="p-0 !rounded-button cursor-pointer">Forgot Password?</Button>
+            </div>
+          </Form>
+        </TabPane>
+        
+        <TabPane tab="Signup" key="signup">
+          <Form layout="vertical">
+            <Form.Item label="Full Name" required>
+              <Input placeholder="Enter full name" />
+            </Form.Item>
+            <Form.Item label="Email" required>
+              <Input type="email" placeholder="Enter email address" />
+            </Form.Item>
+            <Form.Item label="Phone Number" required>
+              <Input placeholder="Enter phone number" />
+            </Form.Item>
+            <Form.Item label="Password" required>
+              <Input.Password placeholder="Create password" />
+            </Form.Item>
+            <Form.Item>
+              <Button 
+                type="primary" 
+                className="w-full bg-red-600 border-red-600 hover:bg-red-700 !rounded-button whitespace-nowrap cursor-pointer"
+                onClick={() => {
+                  setIsLoggedIn(true);
+                  setShowLoginModal(false);
+                }}
+              >
+                Sign Up
+              </Button>
+            </Form.Item>
+          </Form>
+        </TabPane>
+      </Tabs>
+      
+      <Divider>Or continue with</Divider>
+      
+      <Space direction="vertical" className="w-full">
+        <Button 
+          className="w-full !rounded-button whitespace-nowrap cursor-pointer" 
+          icon={<i className="fab fa-google text-red-500"></i>}
+        >
+          Continue with Google
+        </Button>
+        <Button 
+          className="w-full !rounded-button whitespace-nowrap cursor-pointer" 
+          icon={<i className="fab fa-facebook text-blue-600"></i>}
+        >
+          Continue with Facebook
+        </Button>
+      </Space>
+    </Modal>
+  );
+
+  const renderCurrentPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return renderHomePage();
+      case 'search':
+        return renderSearchResults();
+      case 'seats':
+        return renderSeatSelection();
+      case 'passenger':
+        return renderPassengerDetails();
+      case 'payment':
+        return renderPaymentPage();
+      case 'confirmation':
+        return renderConfirmation();
+      case 'bookings':
+        return renderBookings();
+      default:
+        return renderHomePage();
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      <style>
+        {`
+          .!rounded-button {
+            border-radius: 6px !important;
+          }
+          
+          body {
+            min-height: 1024px;
+            width: 1440px;
+            margin: 0 auto;
+          }
+          
+          input[type="number"]::-webkit-outer-spin-button,
+          input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+          
+          input[type="number"] {
+            -moz-appearance: textfield;
+          }
+          
+          .ant-input {
+            border: 1px solid #d1d5db;
+          }
+          
+          .ant-input:focus,
+          .ant-input-focused {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+          }
+          
+          .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+            border-color: #dc2626;
+          }
+          
+          .ant-select-focused .ant-select-selector {
+            border-color: #dc2626 !important;
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1) !important;
+          }
+        `}
+      </style>
+      
+      {renderHeader()}
+      {renderCurrentPage()}
+      {renderLoginModal()}
+    </div>
+  );
+};
+
+export default App;
